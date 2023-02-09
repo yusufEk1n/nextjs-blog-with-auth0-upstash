@@ -1,0 +1,9 @@
+@tailwind components;
+@tailwind base;
+@tailwind utilities;
+
+@layer components {
+    .site-container {
+        @apply max-w-2xl mx-auto
+    }
+}
