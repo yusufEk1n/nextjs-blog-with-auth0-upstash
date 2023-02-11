@@ -3,13 +3,46 @@ import { useHydrate } from 'next-mdx/client'
 import { mdxComponents } from '../../components/mdx-components'
 import { useAuth0 } from '@auth0/auth0-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export default function PostPage({ post }) {
-  const { loginWithRedirect, isAuthenticated, logout, user, isLoading } =
-    useAuth0()
+  const {
+    loginWithRedirect,
+    isAuthenticated,
+    logout,
+    user,
+    isLoading,
+    getAccessTokenSilently
+  } = useAuth0()
+
+  const [text, textSet] = useState('')
+  const [url, urlSet] = useState(null)
+
+  useEffect(() => {
+    const url = window.location.origin + window.location.pathname
+    urlSet(url)
+  }, [])
+
   const content = useHydrate(post, {
     components: mdxComponents
   })
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+
+    const userToken = await getAccessTokenSilently()
+
+    const response = await fetch('/api/comment', {
+      method: 'POST',
+      body: JSON.stringify({ text, userToken, url }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const data = await response.json()
+    console.log(data)
+  }
   return (
     <div className="site-container">
       <article>
@@ -19,13 +52,16 @@ export default function PostPage({ post }) {
         <div className="prose">{content}</div>
       </article>
 
-      <form className="mt-4">
+      <form className="mt-4" onSubmit={onSubmit}>
         <textarea
           rows="3"
           className="border w-full px-2 py-1 border-gray-300 rounded"
+          onChange={(e) => textSet(e.target.value)}
         ></textarea>
 
-        {isAuthenticated ? (
+        {isLoading ? (
+          <p>Loading</p>
+        ) : isAuthenticated ? (
           <div className="mt-4">
             <div className="float-left">
               <div className="flex space-x-3 mb-5 items-center">
