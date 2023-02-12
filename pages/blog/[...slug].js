@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect, useState } from 'react'
 import Form from '../../components/form'
 import Comments from '../../components/comments'
+import { comment } from 'postcss'
 
 export default function PostPage({ post }) {
   const { getAccessTokenSilently } = useAuth0()
@@ -50,7 +51,7 @@ export default function PostPage({ post }) {
       }
     })
 
-    await fetchComment()
+    fetchComment()
     textSet('')
   }
   return (
@@ -68,6 +69,7 @@ export default function PostPage({ post }) {
     </div>
   )
 }
+
 export async function getStaticPaths() {
   return {
     paths: await getMdxPaths('post'),

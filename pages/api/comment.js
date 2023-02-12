@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     }
 
     let redis = new Redis(process.env.REDIS_URL)
-    redis.lpush(url, JSON.stringify(comment))
+    await redis.lpush(url, JSON.stringify(comment))
     redis.quit()
 
     res.status(200).json(comment)
